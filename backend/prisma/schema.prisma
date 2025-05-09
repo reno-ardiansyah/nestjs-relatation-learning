@@ -18,4 +18,45 @@ model Hobbies {
   name        String
   created_at  DateTime  @default(now())
   updated_at  DateTime  @default(now())
+
+  peoples     HobbiesOnPeoples[]
+}
+
+model Peoples {
+  id          Int       @default(autoincrement()) @id
+  name        String
+  dob         DateTime?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @default(now())
+
+  PhoneNumbers PhoneNumbers[]
+  IdCard      IdCard?
+  hobbies     HobbiesOnPeoples[]
+}
+
+model PhoneNumbers {
+  id          Int       @default(autoincrement()) @id
+  number      String
+  people_id   Int
+  people      Peoples   @relation(fields: [people_id], references: [id], onDelete: Cascade)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @default(now())
+}
+
+model IdCard {
+  id          Int       @default(autoincrement()) @id
+  number      String
+  people_id   Int       @unique
+  people      Peoples   @relation(fields: [people_id], references: [id], onDelete: Cascade)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @default(now())
+}
+
+model HobbiesOnPeoples {
+  hobbie_id   Int
+  hobbie      Hobbies   @relation(fields: [hobbie_id], references: [id], onDelete: Cascade)
+  people_id   Int
+  people      Peoples   @relation(fields: [people_id], references: [id], onDelete: Cascade)
+  created_at  DateTime  @default(now())
+  @@id([hobbie_id, people_id])
 }
