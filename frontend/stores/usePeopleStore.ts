@@ -47,7 +47,8 @@ export const usePeopleStore = defineStore('peopleStore', {
           hobbies: this.dialogForm.hobbies,
         }
         const res = await useApi<JsonResponse<Person>>()('POST', 'people', payload)
-        this.people.push(res.data)
+
+        await this.fetchItems()
       } catch (err: any) {
         this.error = err
       } finally {

@@ -9,11 +9,11 @@
     "
     :ui="{ footer: 'justify-end' }"
   >
-    <!-- <form @submit.prevent="store.submitDialog()"> -->
     <template #body>
       <div class="space-y-4">
         <UFormField label="Name">
           <UInput
+            class="w-full"
             v-model="store.dialogForm.name"
             placeholder="Enter full name"
             :disabled="store.loading"
@@ -22,6 +22,7 @@
 
         <UFormField label="Date of Birth">
           <UInput
+            class="w-full"
             v-model="store.dialogForm.dob"
             type="date"
             :disabled="store.loading"
@@ -30,6 +31,7 @@
 
         <UFormField label="ID Card Number">
           <UInput
+            class="w-full"
             v-model="store.dialogForm.idCardNumber"
             placeholder="Enter ID card number"
             :disabled="store.loading"
@@ -38,9 +40,9 @@
 
         <UFormField label="Hobbies">
           <USelect
+            class="w-full"
             v-model="store.dialogForm.hobbies"
-            :items="hobbyStore.hobbies"
-            value-key="id"
+            :items="hobbyOptions"
             multiple 
             placeholder="Select hobbies"
             :disabled="store.loading"
@@ -65,7 +67,6 @@
         {{ store.dialogMode === "create" ? "Create" : "Save" }}
       </UButton>
     </template>
-    <!-- </form> -->
   </UModal>
 </template>
 
@@ -73,9 +74,7 @@
 const store = usePeopleStore()
 const hobbyStore = useHobbyStore()
 
-// Prepare options for select from hobbyStore.hobbies
 const hobbyOptions = computed(() =>
-
   hobbyStore.hobbies.map(h => ({ label: h.name, value: h.id }))
 )
   console.log(hobbyStore.hobbies);
