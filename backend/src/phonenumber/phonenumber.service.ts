@@ -1,26 +1,74 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePhonenumberDto } from './dto/create-phonenumber.dto';
 import { UpdatePhonenumberDto } from './dto/update-phonenumber.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class PhonenumberService {
-  create(createPhonenumberDto: CreatePhonenumberDto) {
-    return 'This action adds a new phonenumber';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createPhoneNumberDto: CreatePhonenumberDto) {
+    const { number, people_id } = createPhoneNumberDto;
+
+    const person = await this.prisma.peoples.findUnique({
+      where: { id: people_id },
+    });
+    if (!person)
+      throw new NotFoundException(`People with ID ${people_id} not found`);
+
+    return await this.prisma.phoneNumbers.create({
+      data: {
+        number,
+        people_id,
+      },
+      include: {
+        people: true,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all phonenumber`;
+  async findAll() {
+    return await this.prisma.phoneNumbers.findMany({
+      include: {
+        people: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} phonenumber`;
+  async findOne(id: number) {
+    const phone = await this.prisma.phoneNumbers.findUnique({
+      where: { id },
+      include: {
+        people: true,
+      },
+    });
+
+    if (!phone) {
+      throw new NotFoundException(`Phone number with ID ${id} not found`);
+    }
+
+    return phone;
   }
 
-  update(id: number, updatePhonenumberDto: UpdatePhonenumberDto) {
-    return `This action updates a #${id} phonenumber`;
+  async update(id: number, updatePhoneNumberDto: UpdatePhonenumberDto) {
+    await this.findOne(id);
+
+    return await this.prisma.phoneNumbers.update({
+      where: { id },
+      data: {
+        number: updatePhoneNumberDto.number,
+        people_id: updatePhoneNumberDto.people_id,
+      },
+      include: {
+        people: true,
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} phonenumber`;
+  async remove(id: number) {
+    await this.findOne(id);
+    return await this.prisma.phoneNumbers.delete({
+      where: { id },
+    });
   }
 }
